@@ -2,7 +2,7 @@ from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 
-trading_client = TradingClient('api-key', 'secret-key', paper=True)
+trading_client = TradingClient('PKD6PB46QLVPY3ABNUNB', 'WfvEzc8mN2EMokCLWN6yNkz0tRDyrxUvwtP0zT0V', paper=True)
 
 # preparing orders
 market_order_data = MarketOrderRequest(
