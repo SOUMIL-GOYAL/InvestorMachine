@@ -5,7 +5,59 @@ from alpaca.trading.enums import OrderSide, TimeInForce
 trading_client = TradingClient('PK342HRR8ZE8JCJNSMQL', 'vyqsQIbXBVppPgIz4X3vBMdoEGm0Y8j9cJunkY5W', paper=True)
 
 # preparing orders
-market_order_data = MarketOrderRequest(symbol="MSFT", qty=1, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+market_order_data = MarketOrderRequest(symbol="SPY", notional=4000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
 
 # Market order
 market_order = trading_client.submit_order(order_data=market_order_data)
+
+# import required modules
+import requests
+
+api_key = "7d99e344057c583ac695552ab47ebb07"
+
+base_url = "http://api.openweathermap.org/data/2.5/weather?"
+
+city_name = input("Enter city name : ")
+
+
+complete_url = base_url + "appid=" + api_key + "&q=" + city_name
+
+
+response = requests.get(complete_url)
+
+
+x = response.json()
+print(x)
+
+# 404 means sity is not found
+if x["cod"] != "404":
+
+    
+	y = x["main"]
+
+
+	current_temperature = y["temp"]
+
+
+	current_pressure = y["pressure"]
+
+
+	current_humidity = y["humidity"]
+
+
+	z = x["weather"]
+
+
+	weather_description = z[0]["description"]
+
+	print(" Temperature (in kelvin unit) = " +
+					str(current_temperature) +
+		"\n atmospheric pressure (in hPa unit) = " +
+					str(current_pressure) +
+		"\n humidity (in percentage) = " +
+					str(current_humidity) +
+		"\n description = " +
+					str(weather_description))
+
+else:
+	print(" City Not Found ")
