@@ -1,8 +1,14 @@
+# "Rule number one is never lose money, rule number two is never forget rule number one" - Warren Buffett
+
+
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 
-trading_client = TradingClient('PK342HRR8ZE8JCJNSMQL', 'vyqsQIbXBVppPgIz4X3vBMdoEGm0Y8j9cJunkY5W', paper=True)
+secrets = {"Key": 'PKTNJQZ66SO3AZ80NN17', "Secret" : '4YHOgI6bvXXhBekG17IfGaMFCeRCHTkxVs5Etld8'}
+
+
+trading_client = TradingClient(secrets["Key"], secrets["Secret"], paper=True)
 
 # preparing orders
 market_order_data = MarketOrderRequest(symbol="SPY", notional=4000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
