@@ -23,7 +23,7 @@ api_key = "7d99e344057c583ac695552ab47ebb07"
 
 base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
-city_name = input("Enter city name : ")
+city_name = "Singapore" #input("Enter city name : ")
 
 
 complete_url = base_url + "appid=" + api_key + "&q=" + city_name
