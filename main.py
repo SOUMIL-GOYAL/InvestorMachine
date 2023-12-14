@@ -1,6 +1,4 @@
 # "Rule number one is never lose money, rule number two is never forget rule number one" - Warren Buffett
-
-
 from time import sleep
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import MarketOrderRequest
@@ -35,7 +33,7 @@ while (True):
 		1+1	
 	if (False): #whether trade
 		1+1	
-	#sleep(120)
+	sleep(120)
 	
 
 
