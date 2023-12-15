@@ -1,7 +1,7 @@
 # "Rule number one is never lose money, rule number two is never forget rule number one" - Warren Buffett
 from time import sleep
 from alpaca.trading.client import TradingClient
-from alpaca.trading.requests import MarketOrderRequest
+from alpaca.trading.requests import MarketOrderRequest, LimitOrderRequest
 from alpaca.trading.enums import OrderSide, TimeInForce
 import requests
 from alpaca.data import StockHistoricalDataClient
@@ -17,6 +17,8 @@ stock_client = StockHistoricalDataClient(alpaca_secrets["Key"],  alpaca_secrets[
 spy = {"symbol" : "SPY", "history" : [], "owned": False}
 investments = [spy, ]
 
+counter = 0
+
 # with open("history.csv") as csvfile:
 # 	reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC) # change contents to floats
 # 	for row in reader: # each row is a list
@@ -28,22 +30,22 @@ investments = [spy, ]
 # print(trading_client.get_account())
 
 while (True):
-	if (trading_client.get_clock().is_open == False): #market is over # type: ignore
-		break
-	else:
-		print("market is open! \n")
+	# if (trading_client.get_clock().is_open == False): #market is over # type: ignore
+	# 	print("market is not open; breaking loop")
+	# 	break
+	# else:
+	# 	print("market is open! \n")
 	
-	multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols=["SPY"])
-	latest_multisymbol_quotes = stock_client.get_stock_latest_quote(multisymbol_request_params)
-	spy["history"].append(latest_multisymbol_quotes["SPY"].ask_price)
-	print(spy["history"])
-
 	# with open("history.csv", 'w') as csvfile:
 	# 	write = csv.writer(csvfile)
 	# 	for x in spy["history"]:
 	# 		write.writerow(x)
 
 	for stock in investments:
+		multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols= [stock["symbol"]])
+		latest_multisymbol_quotes = stock_client.get_stock_latest_quote(multisymbol_request_params)
+		spy["history"].append(latest_multisymbol_quotes[stock["symbol"]].ask_price)
+		print(spy["history"][-5:])
 		try:
 			trading_client.get_open_position(stock["symbol"])
 			stock["owned"] = True
@@ -57,22 +59,37 @@ while (True):
 				money = float(trading_client.get_account().regt_buying_power) # type: ignore
 				print("$", money, " available")
 				if (stock["history"][-1] > stock["history"][-2] and stock["history"][-2] > stock["history"][-3]): #stock trade to be make
-					market_order_data = MarketOrderRequest(symbol="SPY", notional=money - 100000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					market_order_data = MarketOrderRequest(symbol="SPY", notional=money - 1000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
 					market_order = trading_client.submit_order(order_data=market_order_data)
 					print("bought")
+					
+					# limit_order_data = LimitOrderRequest(symbol="BTC/USD", limit_price=money-100000+10, notional=4000, side=OrderSide.SELL, time_in_force=TimeInForce.FOK)
+					# limit_order = trading_client.submit_order(order_data=limit_order_data)
+
+
+
 				elif (stock["history"][-1] < stock["history"][-2] and stock["history"][-2] < stock["history"][-3]): #short
-					# market_order_data = MarketOrderRequest(symbol="SPY", notional=-money + 100000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					# market_order_data = MarketOrderRequest(symbol="SPY", notional=-money + 1000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
 					# market_order = trading_client.submit_order(order_data=market_order_data)
 					print("shorted")
 				else:
 					print("neither shorting not buying!")
 		elif (stock["owned"] == True): #owned
-			if (trading_client.get_open_position(stock["symbol"]).avg_entry_price < trading_client.get_open_position(stock["symbol"]).current_price): #position is profitable # type: ignore
+
+			inprice = float(trading_client.get_open_position(stock["symbol"]).avg_entry_price) # type: ignore
+			nowprice = float(trading_client.get_open_position(stock["symbol"]).current_price) # type: ignore
+			amountowned = float(trading_client.get_open_position(stock["symbol"]).qty) # type: ignore
+			if (inprice < nowprice): #position is profitable # type: ignore
 				trading_client.close_position(stock["symbol"])
-				print("sold!")
+				print("sold! we made $", (nowprice-inprice) * amountowned)
 			else:
+
 				print("not sold, holding...")
-	sleep(10)
+	counter = counter + 1
+	if (counter % 5):
+		sleep(10)
+	else:
+		sleep(2)
 	
 
 
