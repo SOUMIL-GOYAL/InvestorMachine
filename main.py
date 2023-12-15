@@ -30,16 +30,16 @@ counter = 0
 # print(trading_client.get_account())
 
 while (True):
-	# if (trading_client.get_clock().is_open == False): #market is over # type: ignore
-	# 	print("market is not open; breaking loop")
-	# 	break
-	# else:
-	# 	print("market is open! \n")
+	if (trading_client.get_clock().is_open == False): #market is over # type: ignore
+		print("market is not open; breaking loop")
+		break
+	else:
+		print("market is open! \n")
 	
-	# with open("history.csv", 'w') as csvfile:
-	# 	write = csv.writer(csvfile)
-	# 	for x in spy["history"]:
-	# 		write.writerow(x)
+	with open("history.csv", 'w') as csvfile:
+		write = csv.writer(csvfile)
+		for x in spy["history"]:
+			write.writerow(x)
 
 	for stock in investments:
 		multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols= [stock["symbol"]])
@@ -97,49 +97,49 @@ while (True):
 
 
 
-base_url = "http://api.openweathermap.org/data/2.5/weather?"
+# base_url = "http://api.openweathermap.org/data/2.5/weather?"
 
-city_name = "Singapore" #input("Enter city name : ")
-
-
-complete_url = base_url + "appid=" + openweather_secrets["Key"] + "&q=" + city_name
+# city_name = "Singapore" #input("Enter city name : ")
 
 
-response = requests.get(complete_url)
+# complete_url = base_url + "appid=" + openweather_secrets["Key"] + "&q=" + city_name
 
 
-x = response.json()
-# print(x)
+# response = requests.get(complete_url)
 
-# 404 means sity is not found
-if x["cod"] != "404":
+
+# x = response.json()
+# # print(x)
+
+# # 404 means sity is not found
+# if x["cod"] != "404":
 
     
-	y = x["main"]
+# 	y = x["main"]
 
 
-	current_temperature = y["temp"]
+# 	current_temperature = y["temp"]
 
 
-	current_pressure = y["pressure"]
+# 	current_pressure = y["pressure"]
 
 
-	current_humidity = y["humidity"]
+# 	current_humidity = y["humidity"]
 
 
-	z = x["weather"]
+# 	z = x["weather"]
 
 
-	weather_description = z[0]["description"]
+# 	weather_description = z[0]["description"]
 
-	# print(" Temperature (in kelvin unit) = " +
-	# 				str(current_temperature) +
-	# 	"\n atmospheric pressure (in hPa unit) = " +
-	# 				str(current_pressure) +
-	# 	"\n humidity (in percentage) = " +
-	# 				str(current_humidity) +
-	# 	"\n description = " +
-	# 				str(weather_description))
+# 	# print(" Temperature (in kelvin unit) = " +
+# 	# 				str(current_temperature) +
+# 	# 	"\n atmospheric pressure (in hPa unit) = " +
+# 	# 				str(current_pressure) +
+# 	# 	"\n humidity (in percentage) = " +
+# 	# 				str(current_humidity) +
+# 	# 	"\n description = " +
+# 	# 				str(weather_description))
 
-else:
-	print(" City Not Found ")
+# else:
+# 	print(" City Not Found ")
