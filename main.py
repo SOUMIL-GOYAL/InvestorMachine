@@ -8,7 +8,7 @@ from alpaca.data import StockHistoricalDataClient
 from alpaca.data.requests import StockLatestQuoteRequest
 import csv
 
-alpaca_secrets = {"Key": 'PKTNJQZ66SO3AZ80NN17', "Secret" : '4YHOgI6bvXXhBekG17IfGaMFCeRCHTkxVs5Etld8'}
+alpaca_secrets = {"Key": 'PKFX44Y3R3O86HJTBHB2', "Secret" : 'BaaU98K0PYhBNFPr9TiqckKHRvGdWwb4w42I3GDw'}
 openweather_secrets = {"Key": "7d99e344057c583ac695552ab47ebb07"}
 
 trading_client = TradingClient(alpaca_secrets["Key"], alpaca_secrets["Secret"], paper=True)
@@ -17,34 +17,66 @@ stock_client = StockHistoricalDataClient(alpaca_secrets["Key"],  alpaca_secrets[
 spy = {"symbol" : "SPY", "history" : [], "owned": False}
 investments = [spy, ]
 
-with open("history.csv") as csvfile:
-	reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC) # change contents to floats
-	for row in reader: # each row is a list
-		spy["history"].append(row)
+# with open("history.csv") as csvfile:
+# 	reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC) # change contents to floats
+# 	for row in reader: # each row is a list
+# 		spy["history"].append(row)
+# 	#csvfile.close()
 
-print(spy["history"])
+# print(spy["history"][0])
+
+# print(trading_client.get_account())
 
 while (True):
 	if (trading_client.get_clock().is_open == False): #market is over # type: ignore
 		break
 	else:
 		print("market is open! \n")
-	if (False): #stock trade to be make
-		1+1	
-	if (False): #whether trade
-		1+1	
-	sleep(120)
+	
+	multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols=["SPY"])
+	latest_multisymbol_quotes = stock_client.get_stock_latest_quote(multisymbol_request_params)
+	spy["history"].append(latest_multisymbol_quotes["SPY"].ask_price)
+	print(spy["history"])
+
+	# with open("history.csv", 'w') as csvfile:
+	# 	write = csv.writer(csvfile)
+	# 	for x in spy["history"]:
+	# 		write.writerow(x)
+
+	for stock in investments:
+		try:
+			trading_client.get_open_position(stock["symbol"])
+			stock["owned"] = True
+			print("owned")
+		except:
+			stock["owned"] = False
+			print("unowned")
+
+		if (stock["owned"] == False): #unowned
+			if (len(stock["history"]) > 3): 
+				money = float(trading_client.get_account().regt_buying_power) # type: ignore
+				print("$", money, " available")
+				if (stock["history"][-1] > stock["history"][-2] and stock["history"][-2] > stock["history"][-3]): #stock trade to be make
+					market_order_data = MarketOrderRequest(symbol="SPY", notional=money - 100000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					market_order = trading_client.submit_order(order_data=market_order_data)
+					print("bought")
+				elif (stock["history"][-1] < stock["history"][-2] and stock["history"][-2] < stock["history"][-3]): #short
+					# market_order_data = MarketOrderRequest(symbol="SPY", notional=-money + 100000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					# market_order = trading_client.submit_order(order_data=market_order_data)
+					print("shorted")
+				else:
+					print("neither shorting not buying!")
+		elif (stock["owned"] == True): #owned
+			if (trading_client.get_open_position(stock["symbol"]).avg_entry_price < trading_client.get_open_position(stock["symbol"]).current_price): #position is profitable # type: ignore
+				trading_client.close_position(stock["symbol"])
+				print("sold!")
+			else:
+				print("not sold, holding...")
+	sleep(10)
 	
 
 
-multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols=["SPY"])
 
-latest_multisymbol_quotes = stock_client.get_stock_latest_quote(multisymbol_request_params)
-
-print(latest_multisymbol_quotes["SPY"].ask_price)
-market_order_data = MarketOrderRequest(symbol="SPY", notional=4000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
-
-market_order = trading_client.submit_order(order_data=market_order_data)
 
 
 
