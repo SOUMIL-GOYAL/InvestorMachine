@@ -76,6 +76,10 @@ while (True):
 					print("neither shorting not buying!")
 					
 				counter = counter + 1
+
+				if (counter > 50):
+					break
+				
 		elif (stock["owned"] == True): #owned
 
 			inprice = float(trading_client.get_open_position(stock["symbol"]).avg_entry_price) # type: ignore
