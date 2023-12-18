@@ -36,10 +36,10 @@ while (True):
 	else:
 		print("market is open! \n")
 	
-	with open("history.csv", 'w') as csvfile:
-		write = csv.writer(csvfile)
-		for x in spy["history"]:
-			write.writerow(x)
+	# with open("history.csv", 'w') as csvfile:
+	# 	write = csv.writer(csvfile)
+	# 	for x in spy["history"]:
+	# 		write.writerow(x)
 
 	for stock in investments:
 		multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols= [stock["symbol"]])
@@ -89,7 +89,7 @@ while (True):
 	if (counter % 5):
 		sleep(10)
 	else:
-		sleep(2)
+		sleep(1)
 	
 
 
