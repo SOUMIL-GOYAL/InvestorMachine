@@ -56,10 +56,10 @@ while (True):
 
 		if (stock["owned"] == False): #unowned
 			if (len(stock["history"]) > 3): 
-				money = float(trading_client.get_account().regt_buying_power) # type: ignore
+				money = float(trading_client.get_account().daytrading_buying_power) # type: ignore
 				print("$", money, " available")
 				if (stock["history"][-1] > stock["history"][-2] and stock["history"][-2] > stock["history"][-3]): #stock trade to be make
-					market_order_data = MarketOrderRequest(symbol="SPY", notional=money - 1000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					market_order_data = MarketOrderRequest(symbol="SPY", notional= money, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
 					market_order = trading_client.submit_order(order_data=market_order_data)
 					print("bought")
 					
@@ -74,6 +74,8 @@ while (True):
 					print("shorted")
 				else:
 					print("neither shorting not buying!")
+					
+				counter = counter + 1
 		elif (stock["owned"] == True): #owned
 
 			inprice = float(trading_client.get_open_position(stock["symbol"]).avg_entry_price) # type: ignore
@@ -85,7 +87,6 @@ while (True):
 			else:
 
 				print("not sold, holding...")
-	counter = counter + 1
 	if (counter % 5):
 		sleep(10)
 	else:
