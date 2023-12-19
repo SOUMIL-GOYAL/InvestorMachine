@@ -1,5 +1,6 @@
 name: run main.py
-
+concurrency:
+  group: ${{ github.workflow }}
 on:
   push:
   schedule:
