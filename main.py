@@ -10,7 +10,7 @@ import csv
 
 USE_API = True
 
-alpaca_secrets = {"Key": 'PKFX44Y3R3O86HJTBHB2', "Secret" : 'BaaU98K0PYhBNFPr9TiqckKHRvGdWwb4w42I3GDw'}
+alpaca_secrets = {"Key": 'PKUT7AD2QJA7Z4H37BGU', "Secret" : '8lAGAAOOFEaMwcT7NGPGhmXVGRXy4s9wS67741eF'}
 openweather_secrets = {"base_url" : "http://api.openweathermap.org/data/2.5/weather?", "Key": "7d99e344057c583ac695552ab47ebb07", "city_name" : "Singapore", }
 
 trading_client = TradingClient(alpaca_secrets["Key"], alpaca_secrets["Secret"], paper=True)
