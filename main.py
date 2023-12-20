@@ -66,7 +66,7 @@ while (True):
 		if (stock["owned"] == False): #unowned
 
 			if (len(stock["history"]) > 3): 
-				money = float(trading_client.get_account().daytrading_buying_power) # type: ignore
+				money = float(trading_client.get_account().buying_power) # type: ignore
 				print("$", money, " available")
 				if (stock["history"][-1] > stock["history"][-2] and stock["history"][-2] > stock["history"][-3]): #stock trade to be make
 					market_order_data = MarketOrderRequest(symbol="SPY", notional= money/len(investments), side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
