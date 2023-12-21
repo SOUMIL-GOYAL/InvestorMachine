@@ -135,7 +135,7 @@ while (True):
 			print(" City Not Found ")
 	
 
-	sleep(1)
+	sleep(3)
 	
 
 
