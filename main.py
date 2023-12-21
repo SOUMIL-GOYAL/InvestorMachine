@@ -79,7 +79,7 @@ while (True):
 
 
 				elif (stock["history"][-1] < stock["history"][-2] and stock["history"][-2] < stock["history"][-3]): #short
-					# market_order_data = MarketOrderRequest(symbol="SPY", notional=-money + 1000, side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					# market_order_data = MarketOrderRequest(symbol="SPY", qty=422, side=OrderSide.SELL, time_in_force=TimeInForce.DAY)
 					# market_order = trading_client.submit_order(order_data=market_order_data)
 					print("shorted")
 				else:
