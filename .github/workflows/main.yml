@@ -4,7 +4,7 @@ concurrency:
 on:
   push:
   schedule:
-    - cron: '*/1 14-21 * * 1-5'
+    - cron: '*/5 14-21 * * 1-5'
 
 jobs:
   build:

@@ -32,8 +32,8 @@ counter = 0
 # print(trading_client.get_account())
 
 while (True):
-	if (counter > 50):
-		print("50 counts complete, breaking loop")
+	if (counter > 25):
+		print("25 counts complete, breaking loop")
 		break
 
 	if (trading_client.get_clock().is_open == False): #market is over # type: ignore
