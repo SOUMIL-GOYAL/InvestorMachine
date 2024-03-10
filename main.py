@@ -6,18 +6,23 @@ from alpaca.trading.enums import OrderSide, TimeInForce
 import requests
 from alpaca.data import StockHistoricalDataClient
 from alpaca.data.requests import StockLatestQuoteRequest
+from math import floor
 import csv
 
-USE_API = True
+USE_API = False
 
-alpaca_secrets = {"Key": 'PK26HSDY1TKMR2S1ZZ6K', "Secret" : '9uVP5T177qVR5hjnhx7KphvHkysghEmqB5R7rYtE'}
+alpaca_secrets = {"Key": 'PKTDH264NJ4LW7JEW08E', "Secret" : 'J00pT8mAJ03DTVeNdsP7J0ZfjxER3RyzoJY95vqd'}
 openweather_secrets = {"base_url" : "http://api.openweathermap.org/data/2.5/weather?", "Key": "7d99e344057c583ac695552ab47ebb07", "city_name" : "Singapore", }
 
 trading_client = TradingClient(alpaca_secrets["Key"], alpaca_secrets["Secret"], paper=True)
 stock_client = StockHistoricalDataClient(alpaca_secrets["Key"],  alpaca_secrets["Secret"])
 
 spy = {"symbol" : "SPY", "history" : [], "owned": False}
-investments = [spy]
+amzn = {"symbol" : "AMZN", "history" : [], "owned": False}
+tsm = {"symbol" : "TSM", "history" : [], "owned": False}
+
+
+investments = [spy, amzn, tsm]
 
 counter = 0
 
@@ -32,7 +37,7 @@ counter = 0
 # print(trading_client.get_account())
 
 while (True):
-	if (counter > 25):
+	if (counter > 100):
 		print("25 counts complete, breaking loop")
 		break
 
@@ -52,8 +57,8 @@ while (True):
 
 		multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols= [stock["symbol"]])
 		latest_multisymbol_quotes = stock_client.get_stock_latest_quote(multisymbol_request_params)
-		spy["history"].append(latest_multisymbol_quotes[stock["symbol"]].ask_price)
-		print(spy["history"][-5:])
+		stock["history"].append(latest_multisymbol_quotes[stock["symbol"]].ask_price)
+		print(stock["history"][-5:])
 		try:
 			trading_client.get_open_position(stock["symbol"])
 			stock["owned"] = True
@@ -69,7 +74,7 @@ while (True):
 				money = float(trading_client.get_account().buying_power) # type: ignore
 				print("$", money, " available")
 				if (stock["history"][-1] > stock["history"][-2] and stock["history"][-2] > stock["history"][-3]): #stock trade to be make
-					market_order_data = MarketOrderRequest(symbol="SPY", notional= money/len(investments), side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					market_order_data = MarketOrderRequest(symbol= stock["symbol"], notional= floor(money/len(investments)), side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
 					market_order = trading_client.submit_order(order_data=market_order_data)
 					print("bought")
 					
@@ -79,7 +84,7 @@ while (True):
 
 
 				elif (stock["history"][-1] < stock["history"][-2] and stock["history"][-2] < stock["history"][-3]): #short
-					# market_order_data = MarketOrderRequest(symbol="SPY", qty=422, side=OrderSide.SELL, time_in_force=TimeInForce.DAY)
+					# market_order_data = MarketOrderRequest(symbol=stock["symbol"], qty=422, side=OrderSide.SELL, time_in_force=TimeInForce.DAY)
 					# market_order = trading_client.submit_order(order_data=market_order_data)
 					print("shorted")
 				else:
@@ -91,7 +96,7 @@ while (True):
 			inprice = float(trading_client.get_open_position(stock["symbol"]).avg_entry_price) # type: ignore
 			nowprice = float(trading_client.get_open_position(stock["symbol"]).current_price) # type: ignore
 			amountowned = float(trading_client.get_open_position(stock["symbol"]).qty) # type: ignore
-			if (inprice < nowprice): #position is profitable # type: ignore
+			if (inprice + .01 < nowprice): #position is profitable # type: ignore
 				trading_client.close_position(stock["symbol"])
 				print("sold! we made $", (nowprice-inprice) * amountowned)
 				stock["history"] = []
@@ -135,7 +140,7 @@ while (True):
 			print(" City Not Found ")
 	
 
-	sleep(3)
+	sleep(4)
 	
 
 
