@@ -20,11 +20,21 @@ stock_client = StockHistoricalDataClient(alpaca_secrets["Key"],  alpaca_secrets[
 spy = {"symbol" : "SPY", "history" : [], "owned": False}
 amzn = {"symbol" : "AMZN", "history" : [], "owned": False}
 tsm = {"symbol" : "TSM", "history" : [], "owned": False}
+dell = {"symbol" : "DELL", "history" : [], "owned": False}
+nvda = {"symbol" : "NVDA", "history" : [], "owned": False}
+tgt = {"symbol" : "TGT", "history" : [], "owned": False}
+wmt = {"symbol" : "WMT", "history" : [], "owned": False}
+bidu = {"symbol" : "BIDU", "history" : [], "owned": False}
 
 
-investments = [spy, amzn, tsm]
+
+
+
+investments = [spy, amzn, tsm, dell, nvda, tgt, wmt, bidu]
 
 counter = 0
+
+somethingowned = False
 
 # with open("history.csv") as csvfile:
 # 	reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC) # change contents to floats
@@ -37,7 +47,7 @@ counter = 0
 # print(trading_client.get_account())
 
 while (True):
-	if (counter > 100):
+	if (counter > 100 * len(investments)):
 		print("25 counts complete, breaking loop")
 		break
 
@@ -53,12 +63,20 @@ while (True):
 	# 		write.writerow(x)
 
 	for stock in investments:
+		try:
+			trading_client.get_open_position(stock["symbol"])
+			somethingowned = True
+			break
+		except:
+			stock["owned"] = False
+
+	for stock in investments:
 		
 
 		multisymbol_request_params = StockLatestQuoteRequest(symbol_or_symbols= [stock["symbol"]])
 		latest_multisymbol_quotes = stock_client.get_stock_latest_quote(multisymbol_request_params)
 		stock["history"].append(latest_multisymbol_quotes[stock["symbol"]].ask_price)
-		print(stock["history"][-5:])
+		print(stock["symbol"] , stock["history"][-5:])
 		try:
 			trading_client.get_open_position(stock["symbol"])
 			stock["owned"] = True
@@ -68,13 +86,14 @@ while (True):
 			print("unowned")
 
 
-		if (stock["owned"] == False): #unowned
+		if (stock["owned"] == False and somethingowned == False): #unowned
 
 			if (len(stock["history"]) > 3): 
-				money = float(trading_client.get_account().buying_power) # type: ignore
+				money = float(trading_client.get_account().daytrading_buying_power) # type: ignore
 				print("$", money, " available")
 				if (stock["history"][-1] > stock["history"][-2] and stock["history"][-2] > stock["history"][-3]): #stock trade to be make
-					market_order_data = MarketOrderRequest(symbol= stock["symbol"], notional= floor(money/len(investments)), side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					# market_order_data = MarketOrderRequest(symbol= stock["symbol"], notional= floor(money/len(investments)), side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
+					market_order_data = MarketOrderRequest(symbol= stock["symbol"], notional= floor(money), side=OrderSide.BUY, time_in_force=TimeInForce.DAY)
 					market_order = trading_client.submit_order(order_data=market_order_data)
 					print("bought")
 					
@@ -96,7 +115,7 @@ while (True):
 			inprice = float(trading_client.get_open_position(stock["symbol"]).avg_entry_price) # type: ignore
 			nowprice = float(trading_client.get_open_position(stock["symbol"]).current_price) # type: ignore
 			amountowned = float(trading_client.get_open_position(stock["symbol"]).qty) # type: ignore
-			if (inprice + .01 < nowprice): #position is profitable # type: ignore
+			if (inprice + .015 < nowprice): #position is profitable # type: ignore
 				trading_client.close_position(stock["symbol"])
 				print("sold! we made $", (nowprice-inprice) * amountowned)
 				stock["history"] = []
@@ -104,6 +123,8 @@ while (True):
 			else:
 
 				print("not sold, holding...")
+	
+	somethingowned = False
 
 	
 	if (USE_API):
